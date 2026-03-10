@@ -3,6 +3,8 @@ import dotenv from "dotenv"
 import connectDB from "./Config/db.js";
 import mainRoute from "./Routes/mainRoutes.js";
 import cors from "cors"
+import cookieParser from "cookie-parser";
+
 dotenv.config()
 
 
@@ -10,10 +12,12 @@ const app=express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 connectDB()
-app.frontend={
+const frontend={
 origin:"http://localhost:5173",
 credentials:true
 }
+app.use(cookieParser())
+app.use(cors(frontend))
 app.use("/upload",express.static("upload"))
 app.use("/api/",mainRoute)
 app.get("/",(req,res)=>{

@@ -1,28 +1,36 @@
 import React from 'react'
 import {Formik ,Form ,Field } from "formik"
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
+import axios from "axios"
+const backend_url=import.meta.env.VITE_Backend_URL
 
 const Register = () => {
+const nav=useNavigate()
+
   return (
      <div className='h-[90vh] w-full flex justify-center py-20 '>
       <div className='bg-gray-200 w-1/2 flex rounded-2xl overflow-hidden '>
          <div className='bg-pink-300 w-1/2'><img className='h-full w-full object-cover' src="https://images.unsplash.com/photo-1529419412599-7bb870e11810?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" /></div>
          <div className=' flex-1'>
-           <Formik initialValues={{name:"",email:"",password:"",cpassword:""}}
+           <Formik initialValues={{name:"",email:"",password:"",cpassword:"",role:"user"}}
       onSubmit={async(value,{resetForm})=>{
         try {
           
           if(value.password===value.cpassword){
-            toast("account created sucessfully")
             console.log(value)
+            const req=await axios.post(`${backend_url}/api/user/create`,value)
+            toast(req.data.message)
             resetForm()
+            setInterval(()=>{
+               nav("/login")
+            },1000)
           }
           else{
             toast("password doesnot match ")
           }
         } catch (error) {
-          console.log(error)
+          toast(error.response.data.message)
         }
         
       }}

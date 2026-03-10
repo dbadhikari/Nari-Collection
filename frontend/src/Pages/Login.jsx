@@ -1,17 +1,37 @@
 import React from 'react'
 import {Formik ,Form ,Field } from "formik"
-import { NavLink } from 'react-router-dom'
-
+import { NavLink, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+const backend_url=import.meta.env.VITE_Backend_URL
+import { ToastContainer, toast } from 'react-toastify';
+import { useDispatch } from 'react-redux'
+import { setUser } from '../Redux/features/userSlice'
 const Login = () => {
+  const nav=useNavigate()
+  const dispatch=useDispatch()
   return (
     <div className='h-[90vh] w-full flex justify-center py-20 '>
       <div className='bg-gray-200 w-1/2 flex rounded-2xl overflow-hidden '>
          <div className='bg-pink-300 w-1/2'><img className='h-full w-full object-cover' src="https://plus.unsplash.com/premium_photo-1711434824963-ca894373272e?q=80&w=1015&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" /></div>
          <div className=' flex-1'>
            <Formik initialValues={{email:"",password:""}}
-      onSubmit={async(value,{resetForm})=>{
-        console.log(value)
-        resetForm()
+      onSubmit={async(value,)=>{
+        
+        try {
+        console.log(value)  
+        const req=await axios.post(`${backend_url}/api/user/login`,value,{withCredentials: true})
+        localStorage.setItem("token",req.data.token)
+        dispatch(setUser({
+          user:req.data.user,
+          token:req.data.token
+        }))
+
+        nav("/")
+          
+        } catch (error) {
+           toast(error.response.data.message)
+        }
+        
       }}
       >
      
@@ -31,7 +51,7 @@ const Login = () => {
          </div>
       </div>
       
-      
+      <ToastContainer/>
     </div>
   )
 }
